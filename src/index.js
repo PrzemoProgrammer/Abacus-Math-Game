@@ -1,18 +1,14 @@
 const config = {
   type: Phaser.AUTO,
-  physics: {
-    default: "arcade",
-    arcade: {
-      debug: false,
-      gravity: { y: 0.1 },
-    },
-  },
-
+  parent: "game",
   scale: {
     mode: Phaser.Scale.FIT,
     width: 1920,
     height: 1080,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+  dom: {
+    createContainer: true,
   },
   scene: [PlayScene],
 };

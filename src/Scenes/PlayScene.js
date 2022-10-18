@@ -11,10 +11,27 @@ class PlayScene extends Phaser.Scene {
     this.load.image("background", "background.png");
     this.load.image("answerBackground", "answerBackground.png");
     this.load.image("operationBackground", "operationBackground.png");
+    this.load.image("abacusFrame", "abacusFrame.png");
+    this.load.image("inputBox", "inputBox.png");
+
+    this.load.image("bead", "bead.png");
+    this.load.image("skin1", "skin1.png");
+    this.load.image("skin2", "skin2.png");
+    this.load.image("skin3", "skin3.png");
+    this.load.image("skin4", "skin4.png");
+    this.load.image("skin5", "skin5.png");
+    this.load.image("skin6", "skin6.png");
+    this.load.image("skin7", "skin7.png");
+    this.load.image("skin8", "skin8.png");
 
     this.load.plugin(
       "rexinputtextplugin",
       "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexinputtextplugin.min.js",
+      true
+    );
+    this.load.plugin(
+      "rexninepatchplugin",
+      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexninepatchplugin.min.js",
       true
     );
 
@@ -35,7 +52,11 @@ class PlayScene extends Phaser.Scene {
 
     this.addBackground();
     this.addOperation();
-    // this.addInputText();
+
+    this.abacusFrame = this.add.image(330, 150, "abacusFrame").setOrigin(0, 0);
+
+    this.abacus = new Abacus(this, "myAbacus", 0);
+    this.addInputText();
     // this.addAnswer();
   }
 
@@ -49,11 +70,6 @@ class PlayScene extends Phaser.Scene {
     // const answer = new Answer(this, x, 300, "answerBackground");
     // this.answers.push(answer);
     // this.setClickAble(answer);
-  }
-
-  setClickAble() {
-    // answer.onClick(() => {
-    // });
   }
 
   getCutNumber(number) {
@@ -77,33 +93,34 @@ class PlayScene extends Phaser.Scene {
 
   addInputText() {
     const inputbox = this.add.rexNinePatch({
-      x: 100,
-      y: 250,
-      width: 100,
-      height: 40,
+      x: this.operation.container.x + this.operation.displayText.width / 2 + 90,
+      y: 80,
+      width: 160,
+      height: 120,
       key: "inputBox",
       columns: [15, undefined, 15],
       rows: [10, undefined, 10],
     });
 
-    let newName = "";
+    console.log(this.operation.displayText.width);
     const inputText = this.add
       .rexInputText({
-        x: 100,
-        y: 260,
-        width: 100,
-        height: 40,
+        x:
+          this.operation.container.x +
+          this.operation.displayText.width / 2 +
+          170,
+        y: 90,
+        width: 300,
+        height: 140,
         type: "textarea",
-        placeholder: "New name",
-        fontSize: "20px",
-        fontFamily: "SwisBlack",
+        placeholder: "",
+        fontSize: "100px",
+        fontFamily: "LuckiestGuy",
         color: "#ffffff",
-        align: "center",
-        maxLength: 10,
+        align: "left",
+        maxLength: 2,
       })
-      .resize(100, 40)
-      .on("textchange", ({ text }) => {
-        newName = text;
-      });
+      .resize(300, 140)
+      .on("textchange", ({ text }) => {});
   }
 }
