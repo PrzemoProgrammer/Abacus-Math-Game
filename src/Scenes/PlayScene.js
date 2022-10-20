@@ -24,16 +24,16 @@ class PlayScene extends Phaser.Scene {
     this.load.image("skin7", "skin7.png");
     this.load.image("skin8", "skin8.png");
 
-    this.load.plugin(
-      "rexinputtextplugin",
-      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexinputtextplugin.min.js",
-      true
-    );
-    this.load.plugin(
-      "rexninepatchplugin",
-      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexninepatchplugin.min.js",
-      true
-    );
+    // this.load.plugin(
+    //   "rexinputtextplugin",
+    //   "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexinputtextplugin.min.js",
+    //   true
+    // );
+    // this.load.plugin(
+    //   "rexninepatchplugin",
+    //   "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexninepatchplugin.min.js",
+    //   true
+    // );
 
     // this.load.spritesheet("spider1Sprite", "spider1Sprite.png", {
     //   frameWidth: 186 / 2,
@@ -53,10 +53,11 @@ class PlayScene extends Phaser.Scene {
     this.addBackground();
     this.addOperation();
 
-    this.abacusFrame = this.add.image(330, 150, "abacusFrame").setOrigin(0, 0);
+    // this.abacusFrame = this.add.image(330, 150, "abacusFrame").setOrigin(0, 0);
 
-    this.abacus = new Abacus(this, "myAbacus", 0);
-    this.addInputText();
+    // this.abacus = new Abacus(this, "myAbacus", 0);
+    this.abacusNEW = new AbacusNEW(this, 350, 600, "bead");
+    // this.addInputText();
     // this.addAnswer();
   }
 

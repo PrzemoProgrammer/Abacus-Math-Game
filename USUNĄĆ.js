@@ -401,3 +401,63 @@ function Abacus(parentDivId, type) {
     ctx.strokeStyle = strokeStyleBackup;
   }
 }
+
+for (let i = 1; i <= 4; i++) {
+  // if (i / 5 === 0) {
+  //   this.beads[i].move();
+  // }
+
+  if (this.beadIndex === i) {
+    if (!this.beads[i].isMoved) {
+      for (let j = 1; j <= i; j++) {
+        if (!this.beads[j].isMoved) this.beads[j].move();
+      }
+    } else if (this.beads[i].isMoved) {
+      for (let j = i; j <= 4; j++) {
+        if (this.beads[j].isMoved) this.beads[j].move();
+      }
+    }
+  }
+}
+
+for (let i = 6; i <= 9; i++) {
+  if (this.beadIndex === i) {
+    if (!this.beads[i].isMoved) {
+      for (let j = 6; j <= i; j++) {
+        if (!this.beads[j].isMoved) this.beads[j].move();
+      }
+    } else if (this.beads[i].isMoved) {
+      for (let j = i; j <= 9; j++) {
+        if (this.beads[j].isMoved) this.beads[j].move();
+      }
+    }
+  }
+}
+
+for (let i = 11; i <= 14; i++) {
+  if (this.beadIndex === i) {
+    if (!this.beads[i].isMoved) {
+      for (let j = 11; j <= i; j++) {
+        if (!this.beads[j].isMoved) this.beads[j].move();
+      }
+    } else if (this.beads[i].isMoved) {
+      for (let j = i; j <= 14; j++) {
+        if (this.beads[j].isMoved) this.beads[j].move();
+      }
+    }
+  }
+}
+
+for (let i = 16; i <= 19; i++) {
+  if (this.beadIndex === i) {
+    if (!this.beads[i].isMoved) {
+      for (let j = 16; j <= i; j++) {
+        if (!this.beads[j].isMoved) this.beads[j].move();
+      }
+    } else if (this.beads[i].isMoved) {
+      for (let j = i; j <= 19; j++) {
+        if (this.beads[j].isMoved) this.beads[j].move();
+      }
+    }
+  }
+}
