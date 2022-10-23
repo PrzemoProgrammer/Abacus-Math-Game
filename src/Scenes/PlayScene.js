@@ -30,10 +30,30 @@ class PlayScene extends Phaser.Scene {
     this.incorrectAnswerAudio = this.sound.add("incorrectAnswer");
     this.incorrectAnswerAudio.volume = 0.1;
     this.throwBallAudio = this.sound.add("throwBall");
+    this.addFullScreenButton();
   }
 
-  update() {}
+  update() {
+    if (!this.scale.isFullscreen && !this.fullscreen.active) {
+      this.fullscreen.setActive(true);
+      this.fullscreen.setVisible(true);
+    } else if (this.scale.isFullscreen && this.fullscreen.active) {
+      this.fullscreen.setActive(false);
+      this.fullscreen.setVisible(false);
+    }
+  }
+  addFullScreenButton() {
+    this.fullscreen = this.add
+      .image(this.gw - 5, 5, "full-screen")
+      .setOrigin(1, 0)
+      .setScale(2)
+      .setDepth(99999);
+    this.fullscreen.setInteractive();
 
+    this.fullscreen.on("pointerup", () => {
+      this.scale.startFullscreen();
+    });
+  }
   addBackground() {
     this.background = this.add.image(0, 0, "background").setOrigin(0, 0);
   }
