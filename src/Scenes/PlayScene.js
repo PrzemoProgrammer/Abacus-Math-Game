@@ -21,7 +21,8 @@ class PlayScene extends Phaser.Scene {
     this.addBackground();
     this.addOperation();
     this.addCheckButton();
-    this.abacus = new Abacus(this, 230, 550, this.selectedSkin);
+    this.addAbacus();
+    this.addButtonRestart();
     this.addInputText();
 
     this.correctAnswerAudio = this.sound.add("correctAnswer");
@@ -46,6 +47,24 @@ class PlayScene extends Phaser.Scene {
     let randomIndex = Phaser.Math.Between(0, this.answers.length - 1);
     let operationResult = this.getCutNumber(this.operation.result);
     this.answers[randomIndex].displayText.setText(operationResult);
+  }
+
+  addAbacus() {
+    this.abacus = new Abacus(this, 230, 550, this.selectedSkin);
+  }
+
+  addButtonRestart() {
+    this.restartButton = new Button(
+      this,
+      this.gw - 170,
+      this.gh - 170,
+      "restartButton",
+      "restartButtonPushed"
+    );
+    this.restartButton.onClick(() => {
+      this.abacus.destroy();
+      this.addAbacus();
+    });
   }
 
   addOperation() {

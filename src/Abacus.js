@@ -6,6 +6,7 @@ class Abacus {
     this.sprite = sprite;
 
     this.beads = [];
+    this.decimalPoints = [];
 
     this.bead = {
       maxRows: 5,
@@ -21,6 +22,7 @@ class Abacus {
 
     this.isMoved = false;
     this.addFrame();
+    this.addDecimalPoints();
     this.addBeads();
   }
 
@@ -78,6 +80,9 @@ class Abacus {
         bead.column = i;
         bead.row = j;
         this.setBeadClickable(bead);
+        if (bead.row % 5 === 0) {
+          bead.move();
+        }
       }
     }
   }
@@ -98,6 +103,33 @@ class Abacus {
     );
 
     this.ball.shoot(bead);
+  }
+
+  destroy() {
+    for (let i = 0; i < this.bead.maxColumns; i++) {
+      for (let j = 0; j < this.bead.maxRows; j++) {
+        this.beads[i][j].destroy();
+      }
+    }
+    this.decimalPoints.forEach((point) => point.destroy());
+    this.frame.destroy();
+  }
+
+  addDecimalPoint(i) {
+    let decimalPoint = new Point(
+      this.scene,
+      (this.frame.x + 90) * i + 440,
+      this.frame.y + 220,
+      "decimalPoint"
+    );
+    decimalPoint.moveable();
+    this.decimalPoints.push(decimalPoint);
+  }
+
+  addDecimalPoints() {
+    for (let i = 0; i <= 4; i++) {
+      this.addDecimalPoint(i);
+    }
   }
 }
 
@@ -129,5 +161,25 @@ class Bead extends Phaser.GameObjects.Sprite {
       this.isMoved = false;
       this.y = this.y + this.displayHeight;
     }
+  }
+}
+
+class Point extends Phaser.GameObjects.Sprite {
+  constructor(scene, x, y, sprite) {
+    super(scene, x, y, sprite);
+    this.scene = scene;
+    this.x = x;
+    this.y = y;
+    this.sprite = sprite;
+
+    scene.add.existing(this);
+    this.setInteractive();
+  }
+
+  moveable() {
+    this.scene.input.setDraggable(this);
+    this.scene.input.on("drag", function (pointer, gameObject, dragX) {
+      gameObject.x = dragX;
+    });
   }
 }
