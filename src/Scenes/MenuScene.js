@@ -18,6 +18,7 @@ class MenuScene extends Phaser.Scene {
     this.load.image("restartButton", "restartButton.png");
     this.load.image("restartButtonPushed", "restartButtonPushed.png");
     this.load.image("decimalPoint", "decimalPoint.png");
+    this.load.image("full-screen", "full-screen.png");
 
     this.load.image("skin1", "skin1.png");
     this.load.image("skin2", "skin2.png");
