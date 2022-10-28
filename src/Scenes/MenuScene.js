@@ -79,6 +79,8 @@ class MenuScene extends Phaser.Scene {
     });
   }
 
+  update() {}
+
   addBackground() {
     this.background = this.add.image(0, 0, "background").setOrigin(0, 0);
     this.whitePad = this.add.image(this.gw / 2, this.gh / 2, "whitePad");
@@ -105,6 +107,4 @@ class MenuScene extends Phaser.Scene {
   addChooseFrame() {
     this.chooseFrame = this.add.image(-100, -100, "chooseFrame");
   }
-
-  update() {}
 }
