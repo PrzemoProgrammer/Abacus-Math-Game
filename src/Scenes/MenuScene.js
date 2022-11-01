@@ -6,6 +6,7 @@ class MenuScene extends Phaser.Scene {
   preload() {
     this.load.setPath("./src/assets");
     this.load.image("background", "background.png");
+    this.load.image("menuBackground", "menuBackground.png");
     this.load.image("answerBackground", "answerBackground.png");
     this.load.image("operationBackground", "operationBackground.png");
     this.load.image("abacusFrame", "abacusFrame.png");
@@ -53,41 +54,24 @@ class MenuScene extends Phaser.Scene {
     this.addBackground();
     this.addChooseFrame();
     this.addCharacters();
+    this.addText();
+    this.addButton();
 
     this.buttonClickAudio = this.sound.add("buttonClick");
     this.buttonClickAudio.volume = 0.3;
-
-    this.add
-      .text(this.gw / 2, 140, "Choose Character", {
-        align: "center",
-        font: "100px LuckiestGuy",
-        color: "black",
-      })
-      .setOrigin(0.5)
-      .setWordWrapWidth(this.gw * 0.8);
-
-    this.playButton = this.add
-      .image(this.gw / 2, this.gh - 100, "button")
-      .setInteractive()
-      .setOrigin(0.5, 1)
-      .setVisible(false)
-      .setActive(false);
-
-    this.playButton.on("pointerdown", () => {
-      this.buttonClickAudio.play();
-      this.scene.start("PlayScene");
-    });
   }
 
   update() {}
 
   addBackground() {
-    this.background = this.add.image(0, 0, "background").setOrigin(0, 0);
+    this.background = this.add.image(0, 0, "menuBackground").setOrigin(0, 0);
     this.whitePad = this.add.image(this.gw / 2, this.gh / 2, "whitePad");
   }
 
   addCharacter(i) {
-    let character = this.add.image(200 * i + 55, 550, "skin" + i).setScale(2);
+    let character = this.add
+      .image(200 * i + 55, this.whitePad.y - 50, "skin" + i)
+      .setScale(2);
     character.setInteractive();
 
     character.on("pointerdown", () => {
@@ -106,5 +90,30 @@ class MenuScene extends Phaser.Scene {
 
   addChooseFrame() {
     this.chooseFrame = this.add.image(-100, -100, "chooseFrame");
+  }
+
+  addButton() {
+    this.playButton = this.add
+      .image(this.whitePad.x, this.whitePad.y + 400, "button")
+      .setInteractive()
+      .setOrigin(0.5, 1)
+      .setVisible(false)
+      .setActive(false);
+
+    this.playButton.on("pointerdown", () => {
+      this.buttonClickAudio.play();
+      this.scene.start("PlayScene");
+    });
+  }
+
+  addText() {
+    this.add
+      .text(this.gw / 2, this.whitePad.y - 350, "Choose Character", {
+        align: "center",
+        font: "100px LuckiestGuy",
+        color: "black",
+      })
+      .setOrigin(0.5)
+      .setWordWrapWidth(this.gw * 0.8);
   }
 }

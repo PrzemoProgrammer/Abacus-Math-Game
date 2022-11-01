@@ -13,17 +13,22 @@ class PlayScene extends Phaser.Scene {
     this.gh = this.game.config.height;
 
     this.menuScene = this.scene.get("MenuScene");
-
     this.selectedSkin = this.menuScene.selectedSkin;
 
+    this.scene.launch("FightScene", {
+      onPlaySceneCreated: this.onPlaySceneCreated.bind(this), // () => this.onPlaySceneCreated()
+    });
+    this.fightScene = this.scene.get("FightScene");
+
     this.implementText = null;
+    this.isMouseBlock = false;
 
     this.addBackground();
     this.addOperation();
-    this.addCheckButton();
     this.addAbacus();
-    this.addButtonRestart();
     this.addInputText();
+    this.addCheckButton();
+    this.addButtonRestart();
 
     this.correctAnswerAudio = this.sound.add("correctAnswer");
     this.correctAnswerAudio.volume = 0.1;
@@ -56,7 +61,7 @@ class PlayScene extends Phaser.Scene {
     });
   }
   addBackground() {
-    this.background = this.add.image(0, 0, "background").setOrigin(0, 0);
+    this.background = this.add.image(0, 0, "menuBackground").setOrigin(0, 0);
   }
 
   getCutNumber(number) {
@@ -77,7 +82,7 @@ class PlayScene extends Phaser.Scene {
     this.restartButton = new Button(
       this,
       this.gw - 170,
-      this.gh - 170,
+      this.gh - 800,
       "restartButton",
       "restartButtonPushed"
     );
@@ -99,10 +104,7 @@ class PlayScene extends Phaser.Scene {
   addInputText() {
     this.inputbox = this.add
       .rexNinePatch({
-        x:
-          this.operation.container.x +
-          this.operation.displayText.width / 2 +
-          90,
+        x: this.operation.container.x,
         y: -50,
         width: 160,
         height: 120,
@@ -114,17 +116,14 @@ class PlayScene extends Phaser.Scene {
 
     this.tweens.add({
       targets: this.inputbox,
-      y: 80,
+      y: 230,
       duration: 800,
     });
 
     this.inputText = this.add
       .rexInputText({
-        x:
-          this.operation.container.x +
-          this.operation.displayText.width / 2 +
-          125,
-        y: 85,
+        x: this.operation.container.x + 35,
+        y: 235,
         width: 200,
         height: 140,
         type: "textarea",
@@ -141,18 +140,59 @@ class PlayScene extends Phaser.Scene {
       });
   }
 
+  // addInputText() {
+  //   this.inputbox = this.add
+  //     .rexNinePatch({
+  //       x:
+  //         this.operation.container.x +
+  //         this.operation.displayText.width / 2 +
+  //         90,
+  //       y: -50,
+  //       width: 160,
+  //       height: 120,
+  //       key: "inputBox",
+  //       columns: [15, undefined, 15],
+  //       rows: [10, undefined, 10],
+  //     })
+  //     .setDepth(100);
+
+  //   this.tweens.add({
+  //     targets: this.inputbox,
+  //     y: 80,
+  //     duration: 800,
+  //   });
+
+  //   this.inputText = this.add
+  //     .rexInputText({
+  //       x:
+  //         this.operation.container.x +
+  //         this.operation.displayText.width / 2 +
+  //         125,
+  //       y: 85,
+  //       width: 200,
+  //       height: 140,
+  //       type: "textarea",
+  //       placeholder: "",
+  //       fontSize: "100px",
+  //       fontFamily: "LuckiestGuy",
+  //       color: "#ffffff",
+  //       align: "left",
+  //       maxLength: 2,
+  //     })
+  //     .resize(200, 140)
+  //     .on("textchange", ({ text }) => {
+  //       this.implementText = text;
+  //     });
+  // }
+
   addCheckButton() {
     this.checkButton = this.add
-      .image(
-        this.operation.container.x + this.operation.displayText.width / 2 + 330,
-        -50,
-        "checkButton"
-      )
+      .image(this.inputbox.x + 200, -50, "checkButton")
       .setDepth(100);
 
     this.tweens.add({
       targets: this.checkButton,
-      y: 70,
+      y: this.inputbox.y + 280,
       duration: 800,
     });
 
@@ -161,19 +201,23 @@ class PlayScene extends Phaser.Scene {
       if (this.isButtonBlocked) return;
       this.isButtonBlocked = true;
       if (this.implementText == this.operation.result) {
+        this.isButtonBlocked = true;
         this.inputText.fontColor = "rgb(0,255,0)";
         this.correctAnswerAudio.play();
-        this.operationRestart();
+        this.fightScene.player.attack(this.fightScene.enemy);
+        this.operationRestart(3200);
       } else {
+        this.isButtonBlocked = true;
         this.inputText.fontColor = "rgb(255,0,0)";
         this.incorrectAnswerAudio.play();
-        this.operationRestart();
+        this.fightScene.enemy.attack(this.fightScene.player);
+        this.operationRestart(3200);
       }
     });
   }
 
-  operationRestart() {
-    this.time.delayedCall(500, () => {
+  operationRestart(time) {
+    this.time.delayedCall(time, () => {
       this.operation.container.destroy();
       this.inputText.destroy();
       this.inputbox.destroy();
@@ -183,5 +227,17 @@ class PlayScene extends Phaser.Scene {
       this.addCheckButton();
       this.isButtonBlocked = false;
     });
+  }
+
+  // operationDestroy(){
+
+  // }
+
+  onPlaySceneCreated() {
+    this.lunchFight();
+  }
+
+  lunchFight() {
+    this.scene.launch("FightScene");
   }
 }
