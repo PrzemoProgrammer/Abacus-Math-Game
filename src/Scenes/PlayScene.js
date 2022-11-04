@@ -11,6 +11,7 @@ class PlayScene extends Phaser.Scene {
   create() {
     this.gw = this.game.config.width;
     this.gh = this.game.config.height;
+    this.scale.fullscreenTarget = document.getElementById("div");
 
     this.menuScene = this.scene.get("MenuScene");
     this.selectedSkin = this.menuScene.selectedSkin;
@@ -37,6 +38,7 @@ class PlayScene extends Phaser.Scene {
     this.incorrectAnswerAudio.volume = 0.1;
     this.throwBallAudio = this.sound.add("throwBall");
     this.addFullScreenButton();
+    this.handleInputs = new HandleInputs(this);
   }
 
   update() {
@@ -57,6 +59,7 @@ class PlayScene extends Phaser.Scene {
     this.fullscreen.setInteractive();
 
     this.fullscreen.on("pointerup", () => {
+      console.log(this);
       this.scale.startFullscreen();
     });
   }
@@ -122,22 +125,29 @@ class PlayScene extends Phaser.Scene {
 
     this.inputText = this.add
       .rexInputText({
-        x: this.operation.container.x + 35,
-        y: 235,
+        x: this.operation.container.x + 30,
+        y: -59,
         width: 200,
-        height: 140,
-        type: "textarea",
+        height: 120,
+        type: "number",
         placeholder: "",
         fontSize: "100px",
         fontFamily: "LuckiestGuy",
         color: "#ffffff",
         align: "left",
         maxLength: 2,
+        readOnly: false,
       })
-      .resize(200, 140)
+      .resize(200, 120)
       .on("textchange", ({ text }) => {
         this.implementText = text;
       });
+
+    this.tweens.add({
+      targets: this.inputText,
+      y: 235,
+      duration: 800,
+    });
   }
 
   // addInputText() {
@@ -198,22 +208,28 @@ class PlayScene extends Phaser.Scene {
 
     this.checkButton.setInteractive();
     this.checkButton.on("pointerdown", () => {
-      if (this.isButtonBlocked) return;
-      this.isButtonBlocked = true;
-      if (this.implementText == this.operation.result) {
-        this.isButtonBlocked = true;
-        this.inputText.fontColor = "rgb(0,255,0)";
-        this.correctAnswerAudio.play();
-        this.fightScene.player.attack(this.fightScene.enemy);
-        this.operationRestart(3200);
-      } else {
-        this.isButtonBlocked = true;
-        this.inputText.fontColor = "rgb(255,0,0)";
-        this.incorrectAnswerAudio.play();
-        this.fightScene.enemy.attack(this.fightScene.player);
-        this.operationRestart(3200);
-      }
+      this.getCheck();
     });
+  }
+
+  getCheck() {
+    if (this.isButtonBlocked) return;
+    this.isButtonBlocked = true;
+    if (this.implementText == this.operation.result) {
+      this.isButtonBlocked = true;
+      this.inputText.setReadOnly(true);
+      this.inputText.fontColor = "rgb(0,255,0)";
+      this.correctAnswerAudio.play();
+      this.fightScene.player.attack(this.fightScene.enemy);
+      this.operationRestart(3200);
+    } else {
+      this.isButtonBlocked = true;
+      this.inputText.setReadOnly(true);
+      this.inputText.fontColor = "rgb(255,0,0)";
+      this.incorrectAnswerAudio.play();
+      this.fightScene.enemy.attack(this.fightScene.player);
+      this.operationRestart(3200);
+    }
   }
 
   operationRestart(time) {

@@ -64,16 +64,16 @@ class FightScene extends Phaser.Scene {
 
   addBackground() {
     this.background = this.add
-      .image(0, this.gh - 590, "dinoBackground")
+      .image(0, this.gh - 300, "dinoBackground")
       .setOrigin(0, 0);
   }
 
   addPlayer() {
-    this.player = new Dino(this, 0, this.gh - 20, `skin1`, "player");
+    this.player = new Dino(this, 0, this.gh + 40, `skin1`, "player");
   }
 
   addEnemy() {
-    this.enemy = new Dino(this, this.gw - 700, this.gh - 20, `skin2`, "enemy");
+    this.enemy = new Dino(this, this.gw - 700, this.gh + 40, `skin2`, "enemy");
   }
 
   addAnims() {

@@ -95,7 +95,7 @@ class Dino extends Phaser.GameObjects.Sprite {
   }
 
   addHealthBar() {
-    this.healthBar = new HealthBar(this.scene, this.x, this.y, 1000);
+    this.healthBar = new HealthBar(this.scene, this.x, this.y + 160, 1000);
   }
 
   isDead() {

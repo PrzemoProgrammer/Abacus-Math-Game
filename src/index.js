@@ -1,10 +1,10 @@
 const config = {
   type: Phaser.AUTO,
-  parent: "game",
+  parent: "div",
   scale: {
     mode: Phaser.Scale.FIT,
     width: 1920,
-    height: 1600,
+    height: 1290,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   dom: {
