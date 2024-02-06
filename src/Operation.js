@@ -7,12 +7,12 @@ class Operation {
     this.id = 0;
 
     this.equations = [
-      "5 + 2 -10 + 15 + 7",
-      "15 + 10 - 5 - 7 + 8",
-      "23 - 15 - 8 + 0 + 1",
-      "50 - 25 - 4 + 8 + 37",
+      "1 + 1 -1 + 1 + 1",
+      "2 + 2 - 2 - 2 + 2",
+      "3 - 3 - 3 + 3 + 3",
+      "4 - 4 - 4 + 4 + 4",
       "1 - 1 - 1 + 1 + 1",
-      "7 - 9 - 2 + 7 + 3",
+      "5 - 5 - 5 + 5 + 5",
     ];
 
     this.currentEquation =
@@ -24,7 +24,7 @@ class Operation {
     this.displayText = this.scene.add
       .text(
         this.background.x,
-        this.background.y - 4,
+        this.background.y - 8,
         this.currentEquation + " =",
         {
           fontFamily: "LuckiestGuy",

@@ -1,123 +1,170 @@
-class UIElement {
-  constructor(x, y, width, height, type, ref, subref, slotType) {
+class Abacus {
+  constructor(scene, x, y, sprite) {
+    this.scene = scene;
     this.x = x;
     this.y = y;
-    this.x2 = x + width;
-    this.y2 = y + height;
-    this.type = type; // 0 = node, 1 = slot, 2 connection
-    this.ref = ref;
-  }
-}
+    this.sprite = sprite;
 
-class Bead {
-  constructor() {
-    this.position = [0.0, 0.0];
-    this.value = 0;
-    this.active = false;
-    this.uniqueID = -1;
-  }
-}
+    this.beads = [];
+    this.decimalPoints = [];
 
-class AbacusCtrl {
-  constructor(type) {
-    this.type = type;
-    this.beadLines = 8;
-    this.beadPerLine = this.type == 0 ? 5 : 7;
-    this.beadSep = this.type == 0 ? 3 : 4;
-    this.beadHeight = 110;
-    this.beadSpacing = 150;
-    this.beadWidth = 100;
-    this.nodes = [];
+    this.bead = {
+      maxRows: 5,
+      maxColumns: 17,
+      marginX: -12,
+      marginY: 5,
+      slotWeight: 94,
+      slotHeight: 81,
+      gridSpacingX: 40,
+      gridSpacingY: 35,
+      headSpace: 128,
+    };
 
-    this.init();
+    this.isMoved = false;
+    this.addFrame();
+    this.addDecimalPoints();
+    this.addBeads();
   }
 
-  init() {
-    this.nodes.length = 0;
-    this.id = 0;
-    for (let i = 0; i < this.beadLines; i++) {
-      for (let j = 0; j < this.beadPerLine; j++) {
-        let bead = new Bead();
-        bead.position[0] = 580 - i * this.beadSpacing;
-        bead.position[1] =
-          60 + this.beadPerLine * this.beadHeight - j * this.beadHeight;
-        bead.value = 1;
-        if (j > this.beadSep) {
-          bead.position[1] =
-            135 +
-            this.beadPerLine * this.beadHeight -
-            (j * this.beadHeight + 2 * this.beadHeight);
-          bead.value = 5;
+  setBeadClickable(bead) {
+    const beadColumn = bead.column;
+    const beadRow = bead.row;
+
+    bead.onClick(() => {
+      this.shootBall(bead);
+      this.scene.throwBallAudio.play();
+      this.scene.time.delayedCall(200, () => {
+        if (beadRow % 5 === 0) {
+          this.beads[beadColumn][beadRow].move();
+        } else
+          for (let i = 0; i <= 4; i++) {
+            if (beadRow === i) {
+              if (!this.beads[beadColumn][i].isMoved) {
+                for (let j = 1; j <= i; j++) {
+                  if (!this.beads[beadColumn][j].isMoved)
+                    this.beads[beadColumn][j].move();
+                }
+              } else if (this.beads[beadColumn][i].isMoved) {
+                for (let j = i; j <= 4; j++) {
+                  if (this.beads[beadColumn][j].isMoved)
+                    this.beads[beadColumn][j].move();
+                }
+              }
+            }
+          }
+      });
+    });
+  }
+
+  addBeads() {
+    for (let i = 0; i < this.bead.maxColumns; i++) {
+      this.beads[i] = [];
+      for (let j = 0; j < this.bead.maxRows; j++) {
+        this.beads[i][j] = [];
+        let x =
+          this.x +
+          this.bead.marginX +
+          this.bead.slotWeight / 2 +
+          i * (this.bead.slotWeight / 2 + this.bead.gridSpacingX);
+        let y =
+          this.y +
+          this.bead.marginY +
+          this.bead.slotHeight / 2 +
+          j * (this.bead.slotHeight / 2 + this.bead.gridSpacingY);
+
+        if (j / 5 === 0) {
+          y = y - this.bead.headSpace;
         }
-        bead.uniqueID = this.id;
-        this.nodes.push(bead);
-        this.id++;
+        const bead = new Bead(this.scene, x, y, this.sprite);
+        this.beads[i][j] = bead;
+        bead.column = i;
+        bead.row = j;
+        this.setBeadClickable(bead);
+        if (bead.row % 5 === 0) {
+          bead.move();
+        }
       }
     }
   }
 
-  getBeadsCount() {
-    return this.nodes.length;
+  addFrame() {
+    this.frame = this.scene.add
+      .image(this.x - 60, this.y - 248, "abacusFrame")
+      .setOrigin(0, 0);
   }
 
-  getBeadPositionX(nodeId) {
-    return this.nodes[nodeId].position[0];
+  shootBall(bead) {
+    let y = bead.isMoved ? 0 : this.y + 560;
+
+    this.ball = new Ball(
+      this.scene,
+      this.frame.x + this.frame.displayWidth / 2,
+      y
+    );
+
+    this.ball.shoot(bead);
   }
 
-  getBeadPositionY(nodeId) {
-    return this.nodes[nodeId].position[1];
-  }
-
-  activated(nodeId) {
-    this.line = Math.floor(nodeId / this.beadPerLine);
-    this.beadInLine = nodeId - this.line * this.beadPerLine;
-
-    this.active = this.nodes[nodeId].active;
-    this.nodes[nodeId].active = !this.active;
-
-    let dir = 1;
-
-    if (this.beadInLine > this.beadSep) dir = -1;
-
-    this.offset = dir * -1 * this.beadHeight;
-    if (this.active) this.offset = dir * this.beadHeight;
-    this.nodes[nodeId].position[1] += this.offset;
-
-    if (this.beadInLine <= this.beadSep) {
-      for (let j = 0; j < this.beadPerLine; j++) {
-        let n = this.line * this.beadPerLine + j;
-        if (j <= this.beadSep && j !== this.beadInLine) {
-          if (
-            (!this.active && j > this.beadInLine) ||
-            (this.active && j < this.beadInLine)
-          ) {
-            if (this.nodes[n].active === this.active) {
-              this.nodes[n].position[1] += this.offset;
-              this.nodes[n].active = !this.nodes[n].active;
-            }
-          }
-        }
+  destroy() {
+    for (let i = 0; i < this.bead.maxColumns; i++) {
+      for (let j = 0; j < this.bead.maxRows; j++) {
+        this.beads[i][j].destroy();
       }
+    }
+    this.decimalPoints.forEach((point) => point.destroy());
+    this.frame.destroy();
+  }
+
+  addDecimalPoint(i) {
+    let decimalPoint = new Point(
+      this.scene,
+      (this.frame.x + 90) * i + 440,
+      this.frame.y + 220,
+      "decimalPoint"
+    );
+    decimalPoint.moveable();
+    this.decimalPoints.push(decimalPoint);
+  }
+
+  addDecimalPoints() {
+    for (let i = 0; i <= 0; i++) {
+      this.addDecimalPoint(i);
+    }
+  }
+}
+
+class Bead extends Phaser.GameObjects.Sprite {
+  constructor(scene, x, y, sprite) {
+    super(scene, x, y, sprite);
+    this.scene = scene;
+    this.x = x;
+    this.y = y;
+    this.sprite = sprite;
+
+    scene.add.existing(this);
+    this.setInteractive();
+
+    this.isMoved = false;
+  }
+
+  onClick(cb) {
+    this.on("pointerdown", (pointer) => {
+      cb();
+    });
+  }
+
+  move() {
+    if (!this.isMoved) {
+      this.isMoved = true;
+      this.y = this.y - this.displayHeight;
     } else {
-      for (let j = 0; j < this.beadPerLine; j++) {
-        let n = this.line * this.beadPerLine + j;
-        if (j > this.beadSep && j !== this.beadInLine) {
-          if (
-            (!this.active && j < this.beadInLine) ||
-            (this.active && j > this.beadInLine)
-          ) {
-            if (this.nodes[n].active === this.active) {
-              this.nodes[n].position[1] += this.offset;
-              this.nodes[n].active = !this.nodes[n].active;
-            }
-          }
-        }
-      }
+      this.isMoved = false;
+      this.y = this.y + this.displayHeight;
     }
   }
 }
 
-class BeadSprite extends Phaser.GameObjects.Sprite {
+class Point extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y, sprite) {
     super(scene, x, y, sprite);
     this.scene = scene;
@@ -129,120 +176,10 @@ class BeadSprite extends Phaser.GameObjects.Sprite {
     this.setInteractive();
   }
 
-  onClick(cb) {
-    this.on("pointerdown", (pointer) => {
-      cb(pointer);
+  moveable() {
+    this.scene.input.setDraggable(this);
+    this.scene.input.on("drag", function (pointer, gameObject, dragX) {
+      gameObject.x = dragX;
     });
   }
 }
-
-class Abacus {
-  constructor(scene, parentDivId, type) {
-    this.scene = scene;
-    this.parentDivId = parentDivId;
-    this.type = type;
-
-    this.abacusCtrl = new AbacusCtrl(this.type);
-    this.divId = this.parentDivId;
-    this.hooveredElement = -1;
-    this.hooveredBead = -1;
-    this.uiElements = new Array();
-    this.that = this;
-
-    this.drawBeads();
-  }
-
-  drawBead(nodeId) {
-    let nodePosX = this.abacusCtrl.getBeadPositionX(nodeId);
-    let nodePosY = this.abacusCtrl.getBeadPositionY(nodeId);
-
-    let dn = new UIElement(
-      nodePosX,
-      nodePosY + 2,
-      this.abacusCtrl.beadWidth,
-      this.abacusCtrl.beadHeight - 4,
-      0,
-      nodeId,
-      0,
-      0
-    );
-    const column = Math.floor(nodeId / 5) + 1;
-    let bead = new BeadSprite(
-      this.scene,
-      dn.x + 940,
-      dn.y + 360,
-      "skin" + column
-    );
-
-    bead.onClick((pointer) => {
-      this.mouseDown(pointer, bead);
-      this.drawBeads();
-      // console.log(pointer);
-      console.log(1);
-    });
-
-    this.uiElements.push(dn);
-  }
-
-  drawBeads() {
-    let count = this.abacusCtrl.getBeadsCount();
-
-    for (var i = 0; i < count; i++) {
-      this.drawBead(i);
-    }
-  }
-
-  // drawBeadLines() {
-  //   this.bead = this.scene.add.image(dn.x + 900, dn.y + 550, "bead");
-  // }
-
-  mouseOverElement(pos) {
-    this.selectedElement = -1;
-
-    for (let n in this.uiElements) {
-      if (this.uiElements[n].type !== 2) {
-        // not of type "connection"
-        // console.log(this.uiElements[n].x - 1);
-        // console.log(pos.x);
-
-        if (
-          this.uiElements[n].x - 1 < pos.x &&
-          this.uiElements[n].x2 + 1 > pos.x &&
-          this.uiElements[n].y - 1 < pos.y &&
-          this.uiElements[n].y2 + 1 > pos.y
-        ) {
-          console.log(111111111111111111);
-          this.selectedElement = n;
-        }
-      }
-    }
-    return this.selectedElement;
-  }
-
-  mouseDown(pointer) {
-    let selectedElement = this.mouseOverElement(pointer);
-    console.log(selectedElement);
-    console.log(this.uiElements[selectedElement]);
-
-    if (this.uiElements[selectedElement].type === 0) {
-      let newSelectedBead = this.uiElements[selectedElement].ref;
-      this.abacusCtrl.activated(newSelectedBead);
-    }
-  }
-}
-
-// class AbacusCtrl {
-//   constructor(type) {
-//     this.type = type;
-//     this.beadLines = 8;
-//     this.beadPerLine = this.type == 0 ? 5 : 7;
-//     this.beadSep = this.type == 0 ? 3 : 4;
-//     this.beadHeight = 75;
-//     this.beadSpacing = 140;
-//     this.beadWidth = 140;
-//     this.nodes = [];
-
-//     this.init();
-//   }
-
-// let bead = new BeadSprite(this.scene, dn.x + 900, dn.y + 550, "bead");
